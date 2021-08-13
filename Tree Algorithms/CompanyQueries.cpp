@@ -67,7 +67,6 @@ void solve() {
 		cout << query(x, jmp) << endl;
 	}
 
-
 }
 
 signed main() {

@@ -17,12 +17,8 @@ vector<int> adj[N];
 int ans[N];
 
 int sub(int src, int par) {
-	// base
-	if (src != 1 and (int)adj[src].size() == 1)
-	{
-		return ans[src] = 0;
-	}
-
+	// base	
+	
 	// main
 	int tot = 0;
 	for (auto child : adj[src]) {
