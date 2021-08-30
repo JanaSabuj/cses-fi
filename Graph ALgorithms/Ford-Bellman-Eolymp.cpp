@@ -14,83 +14,47 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 2507;
-int n, m;
-
-int dist[N];
-const int INF = 1e17;
-const int NINF = INF * -1;
+const int N = 105;
+const int INF = LLONG_MAX;
 
 struct Edge {
 	int u, v, wt;
 	bool operator<(Edge const& e) {
 		return wt < e.wt;
 	}
-
 	Edge(int a, int b, int c) {
 		u = a;
 		v = b;
 		wt = c;
 	}
 };
+
 vector<Edge> veclist;
-int par[N];
-void bellman_ford(int src) {
-	// dummy node makes all dist = 0
-	for (int i = 0; i < n + 2; ++i) {
-		dist[i] = 0;
-		par[i] = -1;
+int dist[N];
+void bellman_ford(int n, int m) {
+
+	for (int i = 1; i <= n; ++i) {
+		dist[i] = INF;
 	}
 
-	// 1. Propagation phase
-	int x = -1;
-	for (int i = 0; i < n; ++i) {
-		x = -1;
-		for (auto e : veclist) {
-			int u = e.u;
-			int v = e.v;
-			int wt = e.wt;
-
-			// if (dist[u] == INF) continue;
-			if (dist[u] + wt < dist[v]) {
-				dist[v] = dist[u] + wt;
-				par[v] = u;
-				dist[v] = max(dist[v], NINF);// lower bound of minima - NINF
-				x = v;
+	dist[1] = 0;
+	for (int i = 0; i < n - 1; ++i) {
+		// n - 1 relaxations
+		for (int j = 0; j < m; j++) {
+			auto e = veclist[j];
+			// u -> v = w
+			if (dist[e.u] < INF) {
+				dist[e.v] = min(dist[e.v], dist[e.u] + e.wt);
 			}
 		}
 	}
-
-	if (x == -1) {
-		// no neg cycle
-		cout << "NO" << endl;
-		return;
-	} else {
-		// x - last negative affected node
-		//2. Neg cycle resolution phase
-
-		for (int i = 0; i < n; ++i) {
-			x = par[x];
-		}
-
-		// now x is a part of the neg cycle
-		vi cycle;
-		for (int v = x;; v = par[v]) {
-			cycle.push_back(v);
-			if (v == x and cycle.size() > 1)
-				break;
-		}
-
-		reverse(cycle.begin(), cycle.end());
-		cout << "YES\n";
-		print1d(cycle);
-	}
-
-	return;
 }
 
+
 void solve() {
+	int n, m;
 	cin >> n >> m;
+
 	int a, b, c;
 	for (int i = 0; i < m; ++i) {
 		cin >> a >> b >> c;
@@ -98,10 +62,16 @@ void solve() {
 		veclist.push_back(e);
 	}
 
-	bellman_ford(-1);// dummy node
+	bellman_ford(n, m);
+	for (int i = 1; i <= n; ++i) {
+		if (dist[i] != INF) {
+			cout << dist[i] << " ";
+		} else
+			cout << 30000 << " ";
+	}
 }
 
-#define SABUJ_JANA_WxF 1
+#define SABUJ_JANA_WF 1
 signed main() {
 	crap;
 #ifdef SABUJ_JANA_WF
@@ -120,4 +90,3 @@ signed main() {
 #endif
 	return 0;
 }
-// find neg cycle in graph
