@@ -15,20 +15,25 @@ void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
 const int N = 1e6 + 7;
-int n;
-int dp[N];// dp[x] = no of ways to get sum x
-void solve() {
-	cin >> n;
-	dp[0] = 1;
 
-	for (int x = 1; x <= n; x++) {
-		for (int i = 1; i <= 6; i++) {
-			if (x - i >= 0)
-				dp[x] = (dp[x] + dp[x - i]) % mod;
+int dp[N];// no of distinct ways to produce sum N
+int n, x;
+int coins[105];
+void solve() {
+	cin >> n >> x;
+	for (int i = 0; i < n; ++i) {
+		cin >> coins[i];
+	}
+
+	dp[0] = 1;
+	for (int i = 1; i <= x; i++) {
+		for (int j = 0; j < n; ++j) {
+			if (i - coins[j] >= 0)
+				dp[i] = (dp[i] + dp[i - coins[j]]) % mod;
 		}
 	}
 
-	cout << dp[n] << endl;
+	cout << dp[x] << endl;
 }
 
 #define SABUJ_JANA_WxF 1
