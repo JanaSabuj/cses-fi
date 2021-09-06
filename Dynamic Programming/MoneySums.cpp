@@ -14,60 +14,45 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 1e5 + 7;
+const int N = 105;
+const int X = 1e5 + 7;
 
-int n, m;
 int arr[N];
-int dp[102][N];// dp[i][j] = no of arrays till index j, ending with i
+int dp[N][X];// dp[i][j] = T/F such that I can take i coins and have sum j
+int n;
+int sum = 0;
 
 void solve() {
-	cin >> n >> m;
+	cin >> n;
+
 	for (int i = 0; i < n; ++i) {
 		cin >> arr[i];
+		sum += arr[i];
 	}
 
-	// base
-	if (arr[0] != 0) dp[arr[0]][0] = 1;
-	else {
-		for (int i = 1; i <= m; ++i) {
-			dp[i][0] = 1;
+	for (int i = 0; i <= n; i++)
+		dp[i][0] = 1;
+
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= sum; ++j) {
+			if (j >= arr[i - 1])
+				dp[i][j] = dp[i - 1][j] || dp[i - 1][j - arr[i - 1]];
+			else
+				dp[i][j] = dp[i - 1][j];
 		}
 	}
 
-
-	for (int i = 1; i < n; ++i) {
-		if (arr[i] != 0) {
-			if (arr[i] - 1 >= 1) (dp[arr[i]][i] += dp[arr[i] - 1][i - 1]) %= mod;
-			if (arr[i] + 1 <= m) (dp[arr[i]][i] += dp[arr[i] + 1][i - 1]) %= mod;
-			(dp[arr[i]][i] += dp[arr[i]][i - 1]) %= mod;
-		} else {
-
-			for (int j = 1; j <= m; j++) {
-				// i th index ends with j
-				if (j - 1 >= 1)
-					(dp[j][i] += dp[j - 1][i - 1]) %= mod;
-				if (j + 1 <= m)
-					(dp[j][i] += dp[j + 1][i - 1]) %= mod;
-				(dp[j][i] += dp[j][i - 1]) %= mod;
-			}
-		}
-
-		// cout << i << " " << dp[22][i] << endl;
+	set<int> st;// no of possible sums using all n items
+	for (int j = 1; j <= sum; ++j) {
+		if (dp[n][j])
+			st.insert(j);
 	}
 
-	// ans
-	int ans = 0;
-	if (arr[n - 1] != 0) {
-		ans = dp[arr[n - 1]][n - 1];;
-	} else {
-		int sum = 0;
-		for (int j = 1; j <= m; j++) {
-			(sum += dp[j][n - 1]) %= mod;
-		}
-		ans = sum;
-	}
 
-	cout << ans << endl;
+	cout << st.size() << endl;
+	for (auto x : st) {
+		cout << x << " ";
+	}
 }
 
 #define SABUJ_JANA_WxF 1

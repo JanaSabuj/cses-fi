@@ -14,61 +14,39 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 1e5 + 7;
+const int N = 505;
 
+int dp[N][N];// dp[i][j] = no of moves to break down a (i,j) rect into any square
 int n, m;
-int arr[N];
-int dp[102][N];// dp[i][j] = no of arrays till index j, ending with i
 
 void solve() {
 	cin >> n >> m;
-	for (int i = 0; i < n; ++i) {
-		cin >> arr[i];
-	}
-
-	// base
-	if (arr[0] != 0) dp[arr[0]][0] = 1;
-	else {
-		for (int i = 1; i <= m; ++i) {
-			dp[i][0] = 1;
-		}
-	}
-
-
-	for (int i = 1; i < n; ++i) {
-		if (arr[i] != 0) {
-			if (arr[i] - 1 >= 1) (dp[arr[i]][i] += dp[arr[i] - 1][i - 1]) %= mod;
-			if (arr[i] + 1 <= m) (dp[arr[i]][i] += dp[arr[i] + 1][i - 1]) %= mod;
-			(dp[arr[i]][i] += dp[arr[i]][i - 1]) %= mod;
-		} else {
-
-			for (int j = 1; j <= m; j++) {
-				// i th index ends with j
-				if (j - 1 >= 1)
-					(dp[j][i] += dp[j - 1][i - 1]) %= mod;
-				if (j + 1 <= m)
-					(dp[j][i] += dp[j + 1][i - 1]) %= mod;
-				(dp[j][i] += dp[j][i - 1]) %= mod;
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= m; ++j) {
+			if (i == 1 and j == 1) dp[i][j] = 0;
+			else if (i == 1) {
+				dp[i][j] = j - 1;
+			} else if (j == 1) {
+				dp[i][j] = i - 1;
+			} else if (i == j) dp[i][j] = 0;
+			else {
+				// i, j
+				// vert cut
+				dp[i][j] = INT_MAX;
+				for (int c = 1; c <= m - 1; c++)
+					if (j - c >= 1)
+						dp[i][j] = min(dp[i][j], 1 + dp[i][c] + dp[i][j - c]);
+				for (int c = 1; c <= n - 1; c++)
+					if (i - c >= 1)
+						dp[i][j] = min(dp[i][j], 1 + dp[c][j] + dp[i - c][j]);
 			}
 		}
-
-		// cout << i << " " << dp[22][i] << endl;
 	}
 
-	// ans
-	int ans = 0;
-	if (arr[n - 1] != 0) {
-		ans = dp[arr[n - 1]][n - 1];;
-	} else {
-		int sum = 0;
-		for (int j = 1; j <= m; j++) {
-			(sum += dp[j][n - 1]) %= mod;
-		}
-		ans = sum;
-	}
-
-	cout << ans << endl;
+	cout << dp[n][m] << endl;
 }
+
+// O(NM(N+M)) === O(N^3)
 
 #define SABUJ_JANA_WxF 1
 signed main() {

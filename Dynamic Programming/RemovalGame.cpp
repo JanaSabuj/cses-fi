@@ -14,60 +14,35 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 1e5 + 7;
+const int N = 5 * 1e3 + 7;
 
-int n, m;
+int dp[N][N][2];// dp[i][j][p] = value of X for arr[i...j] when pth turn
 int arr[N];
-int dp[102][N];// dp[i][j] = no of arrays till index j, ending with i
+int n;
 
 void solve() {
-	cin >> n >> m;
+	cin >> n;
 	for (int i = 0; i < n; ++i) {
 		cin >> arr[i];
 	}
 
-	// base
-	if (arr[0] != 0) dp[arr[0]][0] = 1;
-	else {
-		for (int i = 1; i <= m; ++i) {
-			dp[i][0] = 1;
+	// l = 1
+	for (int i = 0; i < n; i++) {
+		dp[i][i][0] = arr[i];
+		dp[i][i][1] = 0;
+	}
+
+	// l = 2..n
+	for (int l = 2; l <= n; l++) {
+		for (int i = 0; i + l - 1 < n; i++) {
+			int j = i + l - 1;
+			// [i..j]
+			dp[i][j][0] = max(arr[i] + dp[i + 1][j][1], arr[j] + dp[i][j - 1][1]);
+			dp[i][j][1] = min(0 + dp[i + 1][j][0], 0 + dp[i][j - 1][0]);
 		}
 	}
 
-
-	for (int i = 1; i < n; ++i) {
-		if (arr[i] != 0) {
-			if (arr[i] - 1 >= 1) (dp[arr[i]][i] += dp[arr[i] - 1][i - 1]) %= mod;
-			if (arr[i] + 1 <= m) (dp[arr[i]][i] += dp[arr[i] + 1][i - 1]) %= mod;
-			(dp[arr[i]][i] += dp[arr[i]][i - 1]) %= mod;
-		} else {
-
-			for (int j = 1; j <= m; j++) {
-				// i th index ends with j
-				if (j - 1 >= 1)
-					(dp[j][i] += dp[j - 1][i - 1]) %= mod;
-				if (j + 1 <= m)
-					(dp[j][i] += dp[j + 1][i - 1]) %= mod;
-				(dp[j][i] += dp[j][i - 1]) %= mod;
-			}
-		}
-
-		// cout << i << " " << dp[22][i] << endl;
-	}
-
-	// ans
-	int ans = 0;
-	if (arr[n - 1] != 0) {
-		ans = dp[arr[n - 1]][n - 1];;
-	} else {
-		int sum = 0;
-		for (int j = 1; j <= m; j++) {
-			(sum += dp[j][n - 1]) %= mod;
-		}
-		ans = sum;
-	}
-
-	cout << ans << endl;
+	cout << dp[0][n - 1][0] << endl;
 }
 
 #define SABUJ_JANA_WxF 1
