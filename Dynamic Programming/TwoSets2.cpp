@@ -14,39 +14,54 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 5 * 1e3 + 7;
+const int N = 505;
+const int X = 3 * 1e5 + 7;
 
-int dp[N][N][2];// dp[i][j][p] = value of X for arr[i...j] when pth turn
-int arr[N];
+int dp[N][X];
 int n;
 
-// Minimax Algorithm
+int power(int a, int b, int m) {
+	int res = 1;
+	while (b) {
+		if (b & 1)
+			res = res * a % m;
+		a = a * a % m;
+		b /= 2;
+	}
+
+	return res;
+}
+
 void solve() {
 	cin >> n;
-	for (int i = 0; i < n; ++i) {
-		cin >> arr[i];
+	// for (int i = 0; i < n; ++i) {
+	// 	cin >> arr[i];
+	// }
+
+	int sum = n * (n + 1) / 2;
+
+	if (sum & 1) {
+		cout << 0 << endl;
+		return;
 	}
 
-	// l = 1
-	for (int i = 0; i < n; i++) {
-		dp[i][i][0] = arr[i];
-		dp[i][i][1] = 0;
-	}
+	// base
+	for (int i = 0; i <= n; i++)
+		dp[i][0] = 1;
 
-	// l = 2..n
-	for (int l = 2; l <= n; l++) {
-		for (int i = 0; i + l - 1 < n; i++) {
-			int j = i + l - 1;
-			// [i..j]
-			dp[i][j][0] = max(arr[i] + dp[i + 1][j][1], arr[j] + dp[i][j - 1][1]);
-			dp[i][j][1] = min(0 + dp[i + 1][j][0], 0 + dp[i][j - 1][0]);
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= sum / 2; ++j) {
+			if (j >= i)
+				dp[i][j] = (dp[i - 1][j] + dp[i - 1][j - i]) % mod;
+			else
+				dp[i][j] = dp[i - 1][j] % mod;
 		}
 	}
 
-	cout << dp[0][n - 1][0] << endl;
+	cout << (((dp[n][sum / 2] % mod * power(2, mod - 2, mod))) % mod) << endl;
 }
 
-#define SABUJ_JANA_WF 1
+#define SABUJ_JANA_WxF 1
 signed main() {
 	crap;
 #ifdef SABUJ_JANA_WF

@@ -14,39 +14,33 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 5 * 1e3 + 7;
-
-int dp[N][N][2];// dp[i][j][p] = value of X for arr[i...j] when pth turn
-int arr[N];
+const int N = 2 * 1e5 + 7;
 int n;
+int arr[N];
+// LIS in O(NlogN)
 
-// Minimax Algorithm
 void solve() {
 	cin >> n;
 	for (int i = 0; i < n; ++i) {
 		cin >> arr[i];
 	}
 
-	// l = 1
-	for (int i = 0; i < n; i++) {
-		dp[i][i][0] = arr[i];
-		dp[i][i][1] = 0;
-	}
-
-	// l = 2..n
-	for (int l = 2; l <= n; l++) {
-		for (int i = 0; i + l - 1 < n; i++) {
-			int j = i + l - 1;
-			// [i..j]
-			dp[i][j][0] = max(arr[i] + dp[i + 1][j][1], arr[j] + dp[i][j - 1][1]);
-			dp[i][j][1] = min(0 + dp[i + 1][j][0], 0 + dp[i][j - 1][0]);
+	vi lis;
+	for (int i = 0; i < n; ++i) {
+		if (i == 0)
+			lis.push_back(arr[i]);
+		else if (arr[i] > lis.back())
+			lis.push_back(arr[i]);
+		else {
+			int idx = lower_bound(lis.begin(), lis.end(), arr[i]) - lis.begin();
+			lis[idx] = arr[i];
 		}
 	}
 
-	cout << dp[0][n - 1][0] << endl;
+	cout << lis.size() << endl;
 }
 
-#define SABUJ_JANA_WF 1
+#define SABUJ_JANA_WxF 1
 signed main() {
 	crap;
 #ifdef SABUJ_JANA_WF

@@ -14,39 +14,62 @@ typedef pair<int, int> pii;
 void print1d(const vector<int>& vec) {for (auto val : vec) {cout << val << " ";} cout << endl;}
 void print2d(const vector<vector<int>>& vec) {for (auto row : vec) {for (auto val : row) {cout << val << " ";} cout << endl;}}
 const int mod = 1e9 + 7;
-const int N = 5 * 1e3 + 7;
+const int N = 2 * 1e5 + 7;
 
-int dp[N][N][2];// dp[i][j][p] = value of X for arr[i...j] when pth turn
-int arr[N];
+// weighted job scheduling - BS + DP
+struct Job {
+	int s, f, p;
+};
+
+Job arr[N];
+
+bool cmp(Job& a, Job& b) {
+	return a.f < b.f;
+}
+
+int dp[N];
 int n;
 
-// Minimax Algorithm
+int BS(Job arr[], int n) {
+	int lo = 0, hi = n - 1;
+	while (lo <= hi) {
+		int mid = lo + (hi - lo) / 2;
+		if (arr[mid].f < arr[n].s) {
+			if (arr[mid + 1].f < arr[n].s)
+				lo = mid + 1;
+			else
+				return mid;
+		} else
+			hi = mid - 1;
+	}
+
+	return -1;
+}
+
 void solve() {
 	cin >> n;
 	for (int i = 0; i < n; ++i) {
-		cin >> arr[i];
+		cin >> arr[i].s >> arr[i].f >> arr[i].p;
 	}
 
-	// l = 1
-	for (int i = 0; i < n; i++) {
-		dp[i][i][0] = arr[i];
-		dp[i][i][1] = 0;
+	sort(arr, arr + n, cmp);// sort by ending time
+	dp[0] = arr[0].p;
+
+	for (int i = 1; i < n; ++i) {
+		int excl = dp[i - 1];
+
+		int incl = arr[i].p;
+		int idx = BS(arr, i);
+		if (idx != -1)
+			incl += dp[idx];
+
+		dp[i] = max(incl, excl);
 	}
 
-	// l = 2..n
-	for (int l = 2; l <= n; l++) {
-		for (int i = 0; i + l - 1 < n; i++) {
-			int j = i + l - 1;
-			// [i..j]
-			dp[i][j][0] = max(arr[i] + dp[i + 1][j][1], arr[j] + dp[i][j - 1][1]);
-			dp[i][j][1] = min(0 + dp[i + 1][j][0], 0 + dp[i][j - 1][0]);
-		}
-	}
-
-	cout << dp[0][n - 1][0] << endl;
+	cout << dp[n - 1] << endl;
 }
 
-#define SABUJ_JANA_WF 1
+#define SABUJ_JANA_WxF 1
 signed main() {
 	crap;
 #ifdef SABUJ_JANA_WF
