@@ -57,6 +57,10 @@ struct dsu {
 		for (int i = 0; i < n; i++)
 			make_set(i);
 	}
+	
+	// TC
+	// O(logN) - normally
+	// if both optimisations, O(alpha(N)) = O(4) for n < 10^600
 };
 
 struct Edge {
